@@ -10,5 +10,9 @@
             X = x;
             Y = y;
         }
+
+        public Vector2()
+        {
+        }
     }
 }

@@ -33,17 +33,20 @@ namespace SnakeOnline
                     gameField[snakePosition.Snake[0].X, snakePosition.Snake[0].Y])
                 {
                     snakePosition.GrowSnake(new Snake(
-                        snakePosition.Snake[snakePosition.Snake.Count - 1].X + snakePosition.Snake[snakePosition.Snake.Count - 1].Dx,
-                        snakePosition.Snake[snakePosition.Snake.Count - 1].Y - snakePosition.Snake[snakePosition.Snake.Count - 1].Dy,
+                        snakePosition.Snake[snakePosition.Snake.Count - 1].X +
+                        snakePosition.Snake[snakePosition.Snake.Count - 1].Dx,
+                        snakePosition.Snake[snakePosition.Snake.Count - 1].Y -
+                        snakePosition.Snake[snakePosition.Snake.Count - 1].Dy,
                         snakePosition.Snake[snakePosition.Snake.Count - 1].Skin,
                         snakePosition.Snake[snakePosition.Snake.Count - 1].Color,
                         snakePosition.Snake[snakePosition.Snake.Count - 1].Dx,
                         snakePosition.Snake[snakePosition.Snake.Count - 1].Dy));
-                    
+
                     HandleFood(gameField, food, random);
-                    
-                    while (gameField[food.X, food.Y] == snake.Skin)
-                        HandleFood(gameField, food, random);
+
+                    foreach (var snakePart in snakePosition.Snake)
+                        if (gameField[food.X, food.Y] == gameField[snakePart.X, snakePart.Y])
+                            HandleFood(gameField, food, random);
                 }
 
                 if (Console.KeyAvailable)
@@ -58,9 +61,10 @@ namespace SnakeOnline
                 else
                     isPlaying = false;
 
-                if (gameField[snakePosition.Snake[0].X - snakePosition.Snake[0].Dx,
-                        snakePosition.Snake[0].Y + snakePosition.Snake[0].Dy] == snake.Skin)//fix
-                    isPlaying = false;
+                for (int i = 1; i < snakePosition.Snake.Count; i++)
+                    if (snakePosition.Snake[0].X == snakePosition.Snake[i].X &&
+                        snakePosition.Snake[0].Y == snakePosition.Snake[i].Y)
+                        isPlaying = false;
 
                 Thread.Sleep(150);
             }

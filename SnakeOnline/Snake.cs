@@ -9,14 +9,18 @@ namespace SnakeOnline
         public int Y { get; private set; }
         public int Dx { set; get; }
         public int Dy { get; set; }
-
         public char Skin { get; private set; }
         public ConsoleColor Color { get; private set; }
+        
+        private bool _isChangedDirection;
+        private int _tempI;
 
         private readonly List<Vector2> _snakeRoutsA = new List<Vector2>();
         private readonly List<Vector2> _snakeRoutsD = new List<Vector2>();
         private readonly List<Vector2> _snakeRoutsW = new List<Vector2>();
         private readonly List<Vector2> _snakeRoutsS = new List<Vector2>();
+
+        private readonly Vector2 _tempVector = new Vector2();
 
         public Snake(int x, int y, char skin, ConsoleColor color, int dx, int dy)
         {
@@ -30,7 +34,6 @@ namespace SnakeOnline
 
         public void Move(char[,] map, ConsoleColor color, SnakePosition snakePosition)
         {
-            //2 стыка
             ConsoleColor consoleDefaultColor = Console.BackgroundColor;
             Console.SetCursorPosition(snakePosition.Snake[snakePosition.Snake.Count - 1].Y,
                 snakePosition.Snake[snakePosition.Snake.Count - 1].X);
@@ -73,57 +76,88 @@ namespace SnakeOnline
 
                 //todo: fix instant snake turn
                 if (i == 0) continue;
-                for (int j = 0; j < _snakeRoutsA.Count; j++)
+
+
+                SnakeTurn(_snakeRoutsA, i, snakePosition);
+                SnakeTurn(_snakeRoutsD, i, snakePosition);
+                SnakeTurn(_snakeRoutsW, i, snakePosition);
+                SnakeTurn(_snakeRoutsS, i, snakePosition);
+            }
+        }
+
+        private void SnakeTurn(List<Vector2> snakeRout, int i, SnakePosition snakePosition)
+        {
+            for (int j = 0; j < snakeRout.Count; j++)
+            {
+                if (snakePosition.Snake[i].X == snakeRout[j].X &&
+                    snakePosition.Snake[i].Y == snakeRout[j].Y)
                 {
-                    if (snakePosition.Snake[i].X == _snakeRoutsA[j].X && snakePosition.Snake[i].Y == _snakeRoutsA[j].Y)
+                    if (snakePosition.Snake.Count > 2 && i < snakePosition.Snake.Count - 1)
                     {
-                        snakePosition.Snake[i].Dx = snakePosition.Snake[i - 1].Dx;
-                        snakePosition.Snake[i].Dy = snakePosition.Snake[i - 1].Dy;
+                        for (int k = 0; k < _snakeRoutsA.Count; k++)
+                        {
+                            if (snakePosition.Snake[i + 1].X - snakePosition.Snake[i + 1].Dx == _snakeRoutsA[k].X &&
+                                snakePosition.Snake[i + 1].Y + snakePosition.Snake[i + 1].Dy == _snakeRoutsA[k].Y)
+                            {
+                                _tempVector.X = snakePosition.Snake[i].Dx;
+                                _tempVector.Y = snakePosition.Snake[i].Dy;
+                                _isChangedDirection = true;
+                                _tempI = i;
+                            }
+                        }
+
+                        for (int k = 0; k < _snakeRoutsD.Count; k++)
+                        {
+                            if (snakePosition.Snake[i + 1].X - snakePosition.Snake[i + 1].Dx == _snakeRoutsD[k].X &&
+                                snakePosition.Snake[i + 1].Y + snakePosition.Snake[i + 1].Dy == _snakeRoutsD[k].Y)
+                            {
+                                _tempVector.X = snakePosition.Snake[i].Dx;
+                                _tempVector.Y = snakePosition.Snake[i].Dy;
+                                _isChangedDirection = true;
+                                _tempI = i;
+                            }
+                        }
+
+                        for (int k = 0; k < _snakeRoutsW.Count; k++)
+                        {
+                            if (snakePosition.Snake[i + 1].X - snakePosition.Snake[i + 1].Dx == _snakeRoutsW[k].X &&
+                                snakePosition.Snake[i + 1].Y + snakePosition.Snake[i + 1].Dy == _snakeRoutsW[k].Y)
+                            {
+                                _tempVector.X = snakePosition.Snake[i].Dx;
+                                _tempVector.Y = snakePosition.Snake[i].Dy;
+                                _isChangedDirection = true;
+                                _tempI = i;
+                            }
+                        }
+
+                        for (int k = 0; k < _snakeRoutsS.Count; k++)
+                        {
+                            if (snakePosition.Snake[i + 1].X - snakePosition.Snake[i + 1].Dx == _snakeRoutsS[k].X &&
+                                snakePosition.Snake[i + 1].Y + snakePosition.Snake[i + 1].Dy == _snakeRoutsS[k].Y)
+                            {
+                                _tempVector.X = snakePosition.Snake[i].Dx;
+                                _tempVector.Y = snakePosition.Snake[i].Dy;
+                                _isChangedDirection = true;
+                                _tempI = i;
+                            }
+                        }
                     }
 
-                    if (snakePosition.Snake[snakePosition.Snake.Count - 1].X == _snakeRoutsA[j].X &&
-                        snakePosition.Snake[snakePosition.Snake.Count - 1].Y == _snakeRoutsA[j].Y)
-                        _snakeRoutsA.RemoveAt(j);
-                }
+                    snakePosition.Snake[i].Dx = snakePosition.Snake[i - 1].Dx;
+                    snakePosition.Snake[i].Dy = snakePosition.Snake[i - 1].Dy;
 
-                for (int j = 0; j < _snakeRoutsD.Count; j++)
-                {
-                    if (snakePosition.Snake[i].X == _snakeRoutsD[j].X && snakePosition.Snake[i].Y == _snakeRoutsD[j].Y)
+                    if (_isChangedDirection && i == _tempI + 1)
                     {
-                        snakePosition.Snake[i].Dx = snakePosition.Snake[i - 1].Dx;
-                        snakePosition.Snake[i].Dy = snakePosition.Snake[i - 1].Dy;
+                        snakePosition.Snake[i].Dx = _tempVector.X;
+                        snakePosition.Snake[i].Dy = _tempVector.Y;
+                        _isChangedDirection = false;
+                        _tempI = 0;
                     }
-
-                    if (snakePosition.Snake[snakePosition.Snake.Count - 1].X == _snakeRoutsD[j].X &&
-                        snakePosition.Snake[snakePosition.Snake.Count - 1].Y == _snakeRoutsD[j].Y)
-                        _snakeRoutsD.RemoveAt(j);
                 }
 
-                for (int j = 0; j < _snakeRoutsW.Count; j++)
-                {
-                    if (snakePosition.Snake[i].X == _snakeRoutsW[j].X && snakePosition.Snake[i].Y == _snakeRoutsW[j].Y)
-                    {
-                        snakePosition.Snake[i].Dx = snakePosition.Snake[i - 1].Dx;
-                        snakePosition.Snake[i].Dy = snakePosition.Snake[i - 1].Dy;
-                    }
-
-                    if (snakePosition.Snake[snakePosition.Snake.Count - 1].X == _snakeRoutsW[j].X &&
-                        snakePosition.Snake[snakePosition.Snake.Count - 1].Y == _snakeRoutsW[j].Y)
-                        _snakeRoutsW.RemoveAt(j);
-                }
-
-                for (int j = 0; j < _snakeRoutsS.Count; j++)
-                {
-                    if (snakePosition.Snake[i].X == _snakeRoutsS[j].X && snakePosition.Snake[i].Y == _snakeRoutsS[j].Y)
-                    {
-                        snakePosition.Snake[i].Dx = snakePosition.Snake[i - 1].Dx;
-                        snakePosition.Snake[i].Dy = snakePosition.Snake[i - 1].Dy;
-                    }
-
-                    if (snakePosition.Snake[snakePosition.Snake.Count - 1].X == _snakeRoutsS[j].X &&
-                        snakePosition.Snake[snakePosition.Snake.Count - 1].Y == _snakeRoutsS[j].Y)
-                        _snakeRoutsS.RemoveAt(j);
-                }
+                if (snakePosition.Snake[snakePosition.Snake.Count - 1].X == snakeRout[j].X &&
+                    snakePosition.Snake[snakePosition.Snake.Count - 1].Y == snakeRout[j].Y)
+                    snakeRout.RemoveAt(j);
             }
         }
 
